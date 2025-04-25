@@ -34,7 +34,7 @@ def lambda_handler(event, context):
             }
 
         item = {
-            'item_id': str(uuid.uuid4()),
+            'id': str(uuid.uuid4()),
             'name': body['name'],
             'description': body['description'],
             'location_id': location_id,
