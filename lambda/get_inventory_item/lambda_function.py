@@ -7,14 +7,14 @@ table = dynamodb.Table('Inventory')
 
 def lambda_handler(event, context):
     try:
-        item_id = event['pathParameters']['id']
+        id = event['pathParameters']['id']
 
         # Query all items and find by item_id only (manual filtering)
         response = table.scan()
         items = response.get('Items', [])
 
         # Search for match
-        item = next((i for i in items if i['item_id'] == item_id), None)
+        item = next((i for i in items if i['id'] == id), None)
 
         if not item:
             return {
