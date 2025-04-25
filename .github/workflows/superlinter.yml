@@ -1,0 +1,37 @@
+name: Super-Linter
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+permissions: {}
+
+jobs:
+  build:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: read
+      statuses: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Super-Linter
+        uses: super-linter/super-linter@v7.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # ✅ Validation
+          VALIDATE_PYTHON: true
+          VALIDATE_YAML_PRETTIER: true
+          VALIDATE_HTML_PRETTIER: true
+
+          # ✅ Formatting Fixes (Only use when VALIDATE_* is true)
+          FIX_YAML_PRETTIER: true
+          FIX_HTML_PRETTIER: true
