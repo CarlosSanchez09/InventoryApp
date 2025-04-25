@@ -24,7 +24,7 @@ def lambda_handler(event, context):
         # Use both keys to delete
         table.delete_item(
             Key={
-                'item_id': item['id'],
+                'id': item['id'],
                 'location_id': item['location_id']
             }
         )
