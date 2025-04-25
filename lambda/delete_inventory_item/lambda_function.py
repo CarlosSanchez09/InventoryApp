@@ -7,12 +7,12 @@ table = dynamodb.Table('Inventory')
 
 def lambda_handler(event, context):
     try:
-        item_id = event['pathParameters']['id']
+        id = event['pathParameters']['id']
 
-        # Scan and find full key (item_id + location_id)
+        # Scan and find full key (id + location_id)
         response = table.scan()
         items = response.get('Items', [])
-        item = next((i for i in items if i['item_id'] == item_id), None)
+        item = next((i for i in items if i['id'] == id), None)
 
         if not item:
             return {
@@ -24,7 +24,7 @@ def lambda_handler(event, context):
         # Use both keys to delete
         table.delete_item(
             Key={
-                'item_id': item['item_id'],
+                'item_id': item['id'],
                 'location_id': item['location_id']
             }
         )
