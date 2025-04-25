@@ -1,5 +1,6 @@
 import boto3
 import json
+from boto3.dynamodb.conditions import Attr
 from botocore.exceptions import ClientError
 
 dynamodb = boto3.resource('dynamodb')
@@ -7,31 +8,29 @@ table = dynamodb.Table('Inventory')
 
 def lambda_handler(event, context):
     try:
-        location_id = event.get('pathParameters', {}).get('id')
-        if not location_id:
-            return {
-                'statusCode': 400,
-                'body': json.dumps({'error': 'Missing location_id in path'})
-            }
+        location_id = int(event['pathParameters']['id'])
 
-        response = table.query(
-            IndexName='GSI_Location_Inventory',
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('location_id').eq(int(location_id))
+        response = table.scan(
+            FilterExpression=Attr('location_id').eq(location_id)
         )
 
         items = response.get('Items', [])
+
         return {
             'statusCode': 200,
-            'body': json.dumps(items)
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({'items': items}, default=str)
         }
 
     except ClientError as e:
         return {
             'statusCode': 500,
+            'headers': {'Content-Type': 'application/json'},
             'body': json.dumps({'error': str(e)})
         }
-    except ValueError:
+    except Exception as e:
         return {
-            'statusCode': 400,
-            'body': json.dumps({'error': 'Invalid location_id. Must be a number.'})
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({'error': 'Unhandled exception', 'details': str(e)})
         }
